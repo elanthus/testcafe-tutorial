@@ -13,7 +13,7 @@ const aXeOptions = {
     values:  ['wcag2a', 'best-practice', 'section508'],
   },
   rules:  {
-    label:          {enabled: false},  // reenable this to see axe fail (correctly)
+    'aria-hidden-focus':          {enabled: false},  // reenable this to see axe fail (correctly)
   },
 };
 
