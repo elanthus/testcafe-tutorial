@@ -5,7 +5,7 @@
 A worked example of end-to-end browser testing with [TestCafe]: page objects
 that stay readable as suites grow, React selectors that query component state
 instead of guessing at markup, and accessibility checks that run alongside
-functional ones. The architecture here will help you build reliable, 
+functional ones. The architecture here will help you build reliable,
 maintainable tests over time.
 
 Needs Node 20 or newer and a local Chrome — TestCafe drives browsers you have
@@ -19,12 +19,12 @@ npm test
 
 ## Provenance
 
-The TestCafe examples here began as a tutorial project inside Instructure 
-for teams new to TestCafe, or new to maintainable test architecture, 
-and was hosted at [test_advisory_board], an Apache-2.0 repository at 
-Instructure. I wrote that tutorial code in May 2019; the repository's 
-other examples (Pact for Ruby and Java) were written by colleagues and 
-are not included here. The original commits are preserved in this 
+The TestCafe examples here began as a tutorial project inside Instructure
+for teams new to TestCafe, or new to maintainable test architecture,
+and was hosted at [test_advisory_board], an Apache-2.0 repository at
+Instructure. I wrote that tutorial code in May 2019; the repository's
+other examples (Pact for Ruby and Java) were written by colleagues and
+are not included here. The original commits are preserved in this
 repository's history. (See [NOTICE](NOTICE).)
 
 The 2019 commits are authored as `mswailes-inst`, my Instructure work account.
@@ -42,6 +42,7 @@ described below.
 
 ```
 lib/config.js         environment resolution shared by both suites
+lib/fixturePort.mjs   the fixture app's port, shared by the server and the suite
 fixtures/app/         the React app the local suite runs against
 fixtures/serve.mjs    dependency-free static server, started by TestCafe
 */page/               page objects: selectors and behavior
@@ -66,12 +67,21 @@ to talk to. `npm run test:react` and `./build.sh react` already pass it.
 To point a suite somewhere else:
 
 ```sh
+# Any URL, overriding everything below.
 TEST_BASE_URL=https://staging.example.com npm run test:the-internet
+
+# The fixture app's port, if something on your machine already wants 7357.
+FIXTURE_PORT=7358 npm run test:react
 ```
+
+`TEST_ENV` selects one of the named environments a suite declares in its
+`config.js`. Only `demo` ships, so adding a staging target is a one-line change
+local to that suite — and an unknown name fails with the list of valid ones
+rather than being silently treated as a URL.
 
 `./build.sh` runs the suites in a Linux container with browsers already
 installed. That gets you closer to CI than a run on your own machine, and it is
-the way to run without installing Chrome. On macOS, it also allows you to run 
+the way to run without installing Chrome. On macOS, it also allows you to run
 without granting TestCafe's browser tools screen-recording permission.
 
 ```sh
@@ -95,7 +105,7 @@ the page objects, and anything under `lib/`. It cannot watch `fixtures/app/`,
 because the browser loads that over HTTP and Node never requires it. So:
 
 - Editing a test, a page object, or `lib/` re-runs on its own.
-- Editing the app needs the bundler running in a second terminal 
+- Editing the app needs the bundler running in a second terminal
 
   ```sh
   npm run build:fixture -- --watch=forever
@@ -139,8 +149,8 @@ should, because that is a real change to the component's contract.
 **The local suite owns its target.** `fixtures/app` is a small React app served
 from this repo. The original version of these tests ran against a public
 documentation site, and by 2026 every selector in them had rotted. Owning the
-fixture makes the suite deterministic. The accessibility test there runs with 
-an empty violation baseline, because any violation it finds is one we can 
+fixture makes the suite deterministic. The accessibility test there runs with
+an empty violation baseline, because any violation it finds is one we can
 actually fix.
 
 ### Accessibility baselines
@@ -159,7 +169,10 @@ const ACCEPTED_VIOLATIONS = {
   // /dynamic_controls ship with no associated <label>. A genuine WCAG 2 A
   // failure in the fixture site, verified still present.
   label: {enabled: false},
-  ...
+
+  // "All page content should be contained by landmarks" - the site predates
+  // landmark regions. Best-practice tag rather than a WCAG failure.
+  region: {enabled: false},
 };
 ```
 
@@ -175,7 +188,7 @@ even when nothing here changes.
 
 ## License
 
-Apache 2.0 see [LICENSE](LICENSE) and [NOTICE](NOTICE).
+Apache 2.0 — see [LICENSE](LICENSE) and [NOTICE](NOTICE).
 
 [TestCafe]: https://testcafe.io/
 [test_advisory_board]: https://github.com/mswailes-inst/test_advisory_board
