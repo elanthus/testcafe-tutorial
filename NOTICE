@@ -1,0 +1,14 @@
+testcafe-tutorial
+
+This project originated as the `testcafe/` proof of concept within
+test_advisory_board, an Apache-2.0 licensed repository:
+
+    https://github.com/rolyatwilson/test_advisory_board
+
+The TestCafe example in that repository was written by Michael Swailes in
+May 2019 and is extracted here with its original commit history intact. The
+repository's other proofs of concept (Pact for Ruby and Java) were written by
+other contributors and are not included.
+
+Portions Copyright the test_advisory_board contributors.
+Licensed under the Apache License, Version 2.0. See LICENSE.

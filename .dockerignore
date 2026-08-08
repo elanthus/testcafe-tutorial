@@ -1,0 +1,6 @@
+node_modules
+fixtures/app/dist
+screenshots
+reports
+.git
+*.log
