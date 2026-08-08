@@ -16,7 +16,7 @@ names they depend on:
 | `HamburgerButton` | `expanded` |
 | `NavToggle` | `summary`, `expanded` |
 | `MenuItem` | `value` |
-| `Popover` | — |
+| `Popover` | none |
 
 Renaming any of these breaks the suite, and should: it is a change to the
 component's public API. Restyling, re-nesting, or rewriting the CSS does not.

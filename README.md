@@ -8,7 +8,7 @@ instead of guessing at markup, and accessibility checks that run alongside
 functional ones. The architecture here will help you build reliable,
 maintainable tests over time.
 
-Needs Node 20 or newer and a local Chrome — TestCafe drives browsers you have
+Needs Node 20 or newer and a local Chrome. TestCafe drives browsers you have
 installed rather than bundling its own. If you would rather not install Chrome,
 [`./build.sh`](#running) runs everything in a container instead.
 
@@ -76,7 +76,7 @@ FIXTURE_PORT=7358 npm run test:react
 
 `TEST_ENV` selects one of the named environments a suite declares in its
 `config.js`. Only `demo` ships, so adding a staging target is a one-line change
-local to that suite — and an unknown name fails with the list of valid ones
+local to that suite, and an unknown name fails with the list of valid ones
 rather than being silently treated as a URL.
 
 `./build.sh` runs the suites in a Linux container with browsers already
@@ -155,13 +155,16 @@ actually fix.
 
 ### Accessibility baselines
 
-Both suites run [axe-core] against `wcag2a`, `best-practice`, and `section508`.
+Both suites run [axe-core] against the full WCAG 2.1 Level AA rule set, plus
+`best-practice` and `section508`. Axe's WCAG tags are additive per version
+rather than inclusive, so covering 2.1 AA means naming all four of `wcag2a`,
+`wcag2aa`, `wcag21a`, and `wcag21aa`.
 
 For `fixtures/app`, the accepted-violation list is empty and must stay that way.
 
 For the third-party site, it is not empty, because those violations are not
 ours to fix. Rather than disabling accessibility checking, the suite keeps an
-explicit, justified baseline — anything outside it still fails:
+explicit, justified baseline. Anything outside it still fails:
 
 ```js
 const ACCEPTED_VIOLATIONS = {
@@ -173,11 +176,43 @@ const ACCEPTED_VIOLATIONS = {
   // "All page content should be contained by landmarks" - the site predates
   // landmark regions. Best-practice tag rather than a WCAG failure.
   region: {enabled: false},
+
+  // "Elements must meet minimum color contrast ratio thresholds" - the two
+  // swap buttons on /dynamic_controls fail WCAG 1.4.3. A genuine Level AA
+  // failure, and one the old Level A rule set never looked for; it surfaced
+  // the moment this suite moved to the full 2.1 AA tags.
+  'color-contrast': {enabled: false},
 };
 ```
 
 Delete an entry to watch axe correctly report the violation. Each one was
 re-verified as still present during the 2026 update.
+
+### Why accessibility is tested here
+
+This began as educational software, where accessibility is a legal obligation
+rather than a nice-to-have. Public schools and state universities fall under
+ADA Title II, private institutions under Title III, and anything taking federal
+funds under Section 504 of the Rehabilitation Act.
+
+Title II is the one with a codified technical standard. [DOJ's 2024 rule][doj]
+adopts WCAG 2.1 Level AA, due 26 April 2027 for entities serving 50,000 or more
+people and 26 April 2028 for smaller ones, dates an interim final rule extended
+in April 2026. Title III and Section 504 impose accessibility obligations
+without DOJ adopting a single web standard, which is why WCAG 2.1 AA is the
+working benchmark rather than a literal citation.
+
+That is also why the accessibility checks here are not decoration. Both suites
+run the full 2.1 AA rule set, and `fixtures/app` carries zero violations with
+no baseline.
+
+It is an automated check, not a conformance claim. Axe covers roughly a third
+of WCAG success criteria; focus order, alt-text quality, and screen-reader
+semantics still need manual and assistive-technology testing. What this repo
+shows is the automatable portion wired into CI, so a regression fails the build
+instead of reaching a student.
+
+[doj]: https://www.ada.gov/resources/2024-03-08-web-rule/
 
 ### CI
 
@@ -188,7 +223,7 @@ even when nothing here changes.
 
 ## License
 
-Apache 2.0 — see [LICENSE](LICENSE) and [NOTICE](NOTICE).
+Apache 2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
 
 [TestCafe]: https://testcafe.io/
 [test_advisory_board]: https://github.com/mswailes-inst/test_advisory_board

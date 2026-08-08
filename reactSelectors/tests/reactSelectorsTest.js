@@ -25,7 +25,7 @@ const ACCEPTED_VIOLATIONS = {};
 const axeOptions = {
   runOnly: {
     type: 'tag',
-    values: ['wcag2a', 'best-practice', 'section508'],
+    values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'best-practice', 'section508'],
   },
   rules: ACCEPTED_VIOLATIONS,
 };

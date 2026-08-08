@@ -27,12 +27,18 @@ const ACCEPTED_VIOLATIONS = {
   // "All page content should be contained by landmarks" - the site predates
   // landmark regions. Best-practice tag rather than a WCAG failure.
   region: {enabled: false},
+
+  // "Elements must meet minimum color contrast ratio thresholds" - the two
+  // swap buttons on /dynamic_controls fail WCAG 1.4.3. A genuine Level AA
+  // failure, and one the old Level A rule set never looked for; it surfaced
+  // the moment this suite moved to the full 2.1 AA tags.
+  'color-contrast': {enabled: false},
 };
 
 const axeOptions = {
   runOnly: {
     type: 'tag',
-    values: ['wcag2a', 'best-practice', 'section508'],
+    values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'best-practice', 'section508'],
   },
   rules: ACCEPTED_VIOLATIONS,
 };
