@@ -6,7 +6,8 @@ test_advisory_board, an Apache-2.0 licensed repository:
     https://github.com/mswailes-inst/test_advisory_board
 
 The TestCafe example in that repository was written by Michael Swailes in
-May 2019 and is extracted here with its original commit history intact. The
+May 2019 and is extracted here with its original commit history intact. Those
+commits are authored as `mswailes-inst`, my Instructure work account. The
 repository's other proofs of concept (Pact for Ruby and Java) were written by
 other contributors and are not included.
 

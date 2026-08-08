@@ -8,6 +8,10 @@ instead of guessing at markup, and accessibility checks that run alongside
 functional ones. The architecture here will help you build reliable, 
 maintainable tests over time.
 
+Needs Node 20 or newer and a local Chrome — TestCafe drives browsers you have
+installed rather than bundling its own. If you would rather not install Chrome,
+[`./build.sh`](#running) runs everything in a container instead.
+
 ```sh
 npm install
 npm test
@@ -22,6 +26,8 @@ Instructure. I wrote that tutorial code in May 2019; the repository's
 other examples (Pact for Ruby and Java) were written by colleagues and 
 are not included here. The original commits are preserved in this 
 repository's history. (See [NOTICE](NOTICE).)
+
+The 2019 commits are authored as `mswailes-inst`, my Instructure work account.
 
 Everything since is a 2026 modernization: TestCafe 1.x to 3.x, a rewritten
 test target, GitHub Actions in place of the old internal CI, and the cleanups

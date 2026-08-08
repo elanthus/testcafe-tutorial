@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "TestCafe page-object patterns, React selectors, and axe accessibility checks.",
   "license": "Apache-2.0",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build:fixture": "esbuild fixtures/app/src/index.jsx --bundle --keep-names --jsx=automatic --outfile=fixtures/app/dist/bundle.js",
     "test": "npm run test:the-internet && npm run test:react",
