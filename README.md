@@ -48,11 +48,14 @@ fixtures/serve.mjs    dependency-free static server, started by TestCafe
 npm test                  # both suites, headless Chrome
 npm run test:react        # local fixture app only, no network needed
 npm run test:the-internet # third-party site only
-npm run test:live         # live mode, watches for changes, visible chrome browser
+npm run test:live         # React suite in live mode, visible browser
 npm run lint
 ```
 
-Any browser TestCafe supports works: `npx testcafe firefox theInternet/tests/*.js`.
+Any browser TestCafe supports works:
+`npx testcafe firefox theInternet/tests/*.js`. Invoking the React suite
+directly also needs `--app 'node fixtures/serve.mjs'`, or it has no fixture app
+to talk to. `npm run test:react` and `./build.sh react` already pass it.
 
 To point a suite somewhere else:
 
@@ -60,9 +63,38 @@ To point a suite somewhere else:
 TEST_BASE_URL=https://staging.example.com npm run test:the-internet
 ```
 
-`./build.sh` runs the suite in Docker, which is the closest local equivalent to
-CI. It is also the way to run on macOS without granting screen-recording
-permission to TestCafe's browser tools.
+`./build.sh` runs the suites in a Linux container with browsers already
+installed. That gets you closer to CI than a run on your own machine, and it is
+the way to run without installing Chrome. On macOS, it also allows you to run 
+without granting TestCafe's browser tools screen-recording permission.
+
+```sh
+./build.sh                  # both suites
+./build.sh react            # local fixture app only
+./build.sh the-internet     # third-party site only
+BROWSER=firefox ./build.sh  # any browser the image provides
+```
+
+### Live mode
+
+```sh
+npm run test:live
+```
+
+Keeps a browser open and re-runs the React suite as you work. TestCafe serves
+the fixture app itself via `--app`, so there is nothing to start first.
+
+One thing to know: TestCafe watches the files your tests `require` : the tests,
+the page objects, and anything under `lib/`. It cannot watch `fixtures/app/`,
+because the browser loads that over HTTP and Node never requires it. So:
+
+- Editing a test, a page object, or `lib/` re-runs on its own.
+- Editing the app needs the bundler running in a second terminal 
+
+  ```sh
+  npm run build:fixture -- --watch=forever
+  ```
+  plus a `Ctrl+R` in the live-mode terminal to re-run.
 
 ## Design notes
 

@@ -1,7 +1,8 @@
 # The base image supplies Chromium and Firefox, which is the awkward part of
 # running browser tests in a container. Everything else comes from package.json,
 # so the container and a local `npm test` resolve identical dependency versions.
-FROM testcafe/testcafe:latest
+FROM testcafe/testcafe:3.7.6
+
 
 USER root
 
