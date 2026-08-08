@@ -15,12 +15,13 @@ npm test
 
 ## Provenance
 
-The TestCafe examples here began as a tutorial project inside for teams new
-to TestCafe, or new to maintable test architecture, and was hosted at 
-[test_advisory_board], an Apache-2.0 repository at Instructure. I wrote that
-tutorial code in May 2019; the repository's other examples (Pact for Ruby
-and Java) were written by colleagues and are not included here. The original
-commits are preserved in this repository's history — see [NOTICE](NOTICE).
+The TestCafe examples here began as a tutorial project inside Instructure 
+for teams new to TestCafe, or new to maintainable test architecture, 
+and was hosted at [test_advisory_board], an Apache-2.0 repository at 
+Instructure. I wrote that tutorial code in May 2019; the repository's 
+other examples (Pact for Ruby and Java) were written by colleagues and 
+are not included here. The original commits are preserved in this 
+repository's history. (See [NOTICE](NOTICE).)
 
 Everything since is a 2026 modernization: TestCafe 1.x to 3.x, a rewritten
 test target, GitHub Actions in place of the old internal CI, and the cleanups
@@ -47,7 +48,7 @@ fixtures/serve.mjs    dependency-free static server, started by TestCafe
 npm test                  # both suites, headless Chrome
 npm run test:react        # local fixture app only, no network needed
 npm run test:the-internet # third-party site only
-npm run test:live         # live mode, watches for changes
+npm run test:live         # live mode, watches for changes, visible chrome browser
 npm run lint
 ```
 
@@ -131,7 +132,7 @@ re-verified as still present during the 2026 update.
 
 Three jobs: lint, the local suite, and the third-party suite. The third-party
 job is `continue-on-error`, so someone else's outage does not turn this badge
-red, The result is still reported, and a weekly scheduled run surfaces drift
+red; the result is still reported, and a weekly scheduled run surfaces drift
 even when nothing here changes.
 
 ## License
