@@ -29,8 +29,16 @@ Any violation is a bug to fix here, not to suppress in the test.
 ## Running it by hand
 
 ```sh
-npm run start:fixture   # builds, then serves on http://localhost:3000
+npm run start:fixture   # builds, then serves on http://localhost:7357
 ```
 
 During a test run TestCafe starts and stops the server itself via its `--app`
 option, so there is nothing to manage.
+
+The port lives in [`lib/fixturePort.mjs`](../lib/fixturePort.mjs), shared by the
+server and the suite so they cannot disagree. It is not 3000, because that port
+collides with most dev tooling. If something on your machine wants 7357 too:
+
+```sh
+FIXTURE_PORT=7358 npm run test:react
+```

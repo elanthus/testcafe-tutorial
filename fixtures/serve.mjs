@@ -9,8 +9,9 @@ import {readFile} from 'node:fs/promises';
 import {extname, join, normalize} from 'node:path';
 import {fileURLToPath} from 'node:url';
 
+import {FIXTURE_PORT as PORT} from '../lib/fixturePort.mjs';
+
 const ROOT = join(fileURLToPath(new URL('.', import.meta.url)), 'app');
-const PORT = Number(process.env.FIXTURE_PORT) || 3000;
 
 const CONTENT_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -38,6 +39,21 @@ const server = createServer(async (request, response) => {
   } catch {
     response.writeHead(404).end('Not found');
   }
+});
+
+// Without this, a busy port surfaces as an unhandled 'error' event: a stack
+// trace that buries the one line telling you what to do about it.
+server.on('error', (error) => {
+  if (error.code === 'EADDRINUSE') {
+    console.error(
+      `Port ${PORT} is already in use, so the fixture app could not start.\n` +
+      'Stop whatever is holding it, or pick another port:\n' +
+      `  FIXTURE_PORT=${PORT + 1} npm run test:react`,
+    );
+    process.exit(1);
+  }
+
+  throw error;
 });
 
 server.listen(PORT, () => {
