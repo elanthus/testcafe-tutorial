@@ -13,9 +13,13 @@ installed rather than bundling its own. If you would rather not install Chrome,
 [`./build.sh`](#running) runs everything in a container instead.
 
 ```sh
-npm install
-npm test
+npm ci
+npm run test:react
 ```
+
+That suite runs entirely against a React app in this repo. It needs no network
+and cannot be broken by someone else's redesign, so it is the one to start
+with. `npm test` adds the third-party suite on top.
 
 ## Provenance
 
