@@ -8,7 +8,7 @@
     "test": "npm run test:the-internet && npm run test:react",
     "test:the-internet": "testcafe chrome:headless theInternet/tests/*.js",
     "test:react": "npm run build:fixture && testcafe chrome:headless reactSelectors/tests/*.js --app \"node fixtures/serve.mjs\"",
-    "test:live": "testcafe chrome theInternet/tests/*.js -L",
+    "test:live": "testcafe chrome reactSelectors/tests/*.js -L",
     "start:fixture": "npm run build:fixture && node fixtures/serve.mjs",
     "lint": "eslint ."
   },
