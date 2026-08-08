@@ -105,12 +105,12 @@ the page objects, and anything under `lib/`. It cannot watch `fixtures/app/`,
 because the browser loads that over HTTP and Node never requires it. So:
 
 - Editing a test, a page object, or `lib/` re-runs on its own.
-- Editing the app needs the bundler running in a second terminal
+- Editing the app needs the bundler running in a second terminal:
 
   ```sh
   npm run build:fixture -- --watch=forever
   ```
-  plus a `Ctrl+R` in the live-mode terminal to re-run.
+  plus a `Ctrl+R` in the live-mode terminal to re-run tests.
 
 ## Design notes
 
