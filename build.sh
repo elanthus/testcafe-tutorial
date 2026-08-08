@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
-set -ex
+#
+# Runs the suite inside the container, which is the closest local equivalent to
+# what CI does. `npm test` is the faster path if you have Chrome installed.
+set -euo pipefail
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+IMAGE="testcafe-tutorial"
+BROWSER="${BROWSER:-chromium:headless}"
+TESTS="${1:-theInternet/tests/*.js}"
 
-docker build ./ -t instructure/testcafe
-
-docker run -v $DIR/instUI:/tests/instUI instructure/testcafe firefox /tests/instUI/tests/*.js
-docker run -v $DIR/theInternet:/tests/theInternet instructure/testcafe firefox /tests/theInternet/tests/*.js
+docker build -t "$IMAGE" "$DIR"
+docker run --rm "$IMAGE" "$BROWSER" "$TESTS"

@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  # The third-party suite runs against a site nobody here controls, so a weekly
+  # run surfaces that site drifting even when nothing in this repo changed.
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+
+  # Runs entirely against the fixture app in this repo. Deterministic, no
+  # network. A failure here is always a real failure.
+  test-local:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: React selector and accessibility suite
+        run: >
+          npm run test:react --
+          --screenshots path=screenshots,takeOnFails=true
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: failure-screenshots-local
+          path: screenshots/
+          if-no-files-found: ignore
+
+  # Runs against the-internet.herokuapp.com. Allowed to fail without failing
+  # the build, because an outage there says nothing about this code. The step
+  # still reports, so drift stays visible.
+  test-external:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Third-party fixture site suite
+        run: >
+          npx testcafe chrome:headless theInternet/tests/*.js
+          --screenshots path=screenshots,takeOnFails=true
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: failure-screenshots-external
+          path: screenshots/
+          if-no-files-found: ignore

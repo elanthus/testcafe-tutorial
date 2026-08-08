@@ -1,12 +1,17 @@
-FROM testcafe/testcafe:1.1.3
+# The base image supplies Chromium and Firefox, which is the awkward part of
+# running browser tests in a container. Everything else comes from package.json,
+# so the container and a local `npm test` resolve identical dependency versions.
+FROM testcafe/testcafe:latest
 
 USER root
-ENV NODE_PATH /opt/testcafe/node_modules
-RUN  cd /opt/testcafe && \
-  npm install -g testcafe-react-selectors@^3.1.0 && \
-  npm install -g axe-testcafe@^1.1.0 && \
-  npm install -g minimist@^1.2.0 && \
-  npm link axe-testcafe && \
-  npm link testcafe-react-selectors && \
-  npm link minimist
+
+WORKDIR /tests
+COPY package.json package-lock.json ./
+RUN npm ci --ignore-scripts && npm cache clean --force
+COPY . .
+RUN npm run build:fixture
+
 USER user
+
+ENTRYPOINT ["npx", "testcafe"]
+CMD ["chromium:headless", "theInternet/tests/*.js"]
