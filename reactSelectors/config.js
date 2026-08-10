@@ -1,5 +1,5 @@
-import {resolveBaseUrl} from '../lib/config';
-import {FIXTURE_PORT} from '../lib/fixturePort.mjs';
+import { resolveBaseUrl } from "../lib/config.js";
+import { FIXTURE_PORT } from "../lib/fixturePort.mjs";
 
 export const environments = {
   // The fixture app is served locally by TestCafe's `--app` option, so this
