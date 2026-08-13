@@ -8,13 +8,13 @@ instead of guessing at markup, and accessibility checks that run alongside
 functional ones. The architecture here will help you build reliable,
 maintainable tests over time.
 
-Needs Node 20 or newer and a local Chrome. TestCafe drives browsers you have
+Needs Node 22 or newer and a local Chrome. TestCafe drives browsers you have
 installed rather than bundling its own. If you would rather not install Chrome,
 [`./build.sh`](#running) runs everything in a container instead.
 
 ```sh
 npm ci
-npm run test:react
+npm run test:local
 ```
 
 That suite runs entirely against a React app in this repo. It needs no network
@@ -41,7 +41,7 @@ described below.
 
 | Suite | Target | Demonstrates |
 |---|---|---|
-| `reactSelectors/` | `fixtures/app` - a minimal React app in this repo | React selectors, prop-based state queries, accessibility with a zero-violation policy |
+| `reactSelectors/` | `fixtures/app` - a minimal React app in this repo | React selectors, prop-based state queries, and an accessibility scan of the open menu state |
 | `theInternet/` | [the-internet], a third-party fixture site | Dynamic content, auto-waiting assertions, accessibility with a documented baseline |
 
 ```
@@ -57,7 +57,9 @@ fixtures/serve.mjs    dependency-free static server, started by TestCafe
 
 ```sh
 npm test                  # both suites, headless Chrome
-npm run test:react        # local fixture app only, no network needed
+npm run test:local        # all owned tests, no network needed
+npm run test:react        # local browser suite only
+npm run test:unit         # fast configuration and fixture-server checks
 npm run test:the-internet # third-party site only
 npm run test:live         # React suite in live mode, visible browser
 npm run lint
@@ -153,9 +155,9 @@ should, because that is a real change to the component's contract.
 **The local suite owns its target.** `fixtures/app` is a small React app served
 from this repo. The original version of these tests ran against a public
 documentation site, and by 2026 every selector in them had rotted. Owning the
-fixture makes the suite deterministic. The accessibility test there runs with
-an empty violation baseline, because any violation it finds is one we can
-actually fix.
+fixture makes the suite deterministic. Its accessibility test scans the open
+menu state with an empty violation baseline, because any violation it finds is
+one we can actually fix.
 
 ### Accessibility baselines
 
@@ -164,7 +166,8 @@ Both suites run [axe-core] against the full WCAG 2.1 Level AA rule set, plus
 rather than inclusive, so covering 2.1 AA means naming all four of `wcag2a`,
 `wcag2aa`, `wcag21a`, and `wcag21aa`.
 
-For `fixtures/app`, the accepted-violation list is empty and must stay that way.
+For the tested open-menu state in `fixtures/app`, the accepted-violation list
+is empty and must stay that way.
 
 For the third-party site, it is not empty, because those violations are not
 ours to fix. Rather than disabling accessibility checking, the suite keeps an
@@ -207,8 +210,8 @@ without DOJ adopting a single web standard, which is why WCAG 2.1 AA is the
 working benchmark rather than a literal citation.
 
 That is also why the accessibility checks here are not decoration. Both suites
-run the full 2.1 AA rule set, and `fixtures/app` carries zero violations with
-no baseline.
+run the full 2.1 AA rule set, and the `fixtures/app` open-menu scan permits no
+violations.
 
 It is an automated check, not a conformance claim. Axe covers roughly a third
 of WCAG success criteria; focus order, alt-text quality, and screen-reader
@@ -220,10 +223,11 @@ instead of reaching a student.
 
 ### CI
 
-Three jobs: lint, the local suite, and the third-party suite. The third-party
-job is `continue-on-error`, so someone else's outage does not turn this badge
-red; the result is still reported, and a weekly scheduled run surfaces drift
-even when nothing here changes.
+CI tests the local suite on Node 22 and 24, with Chrome on both and Firefox on
+Node 24. Its stable `CI` result covers lint and all owned tests. The third-party
+job starts only after those jobs finish and is `continue-on-error`, so someone
+else's outage does not turn this badge red; the result is still reported, and
+a weekly scheduled run surfaces drift even when nothing here changes.
 
 ## License
 

@@ -6,12 +6,13 @@
  */
 import {createServer} from 'node:http';
 import {readFile} from 'node:fs/promises';
-import {extname, join, normalize} from 'node:path';
-import {fileURLToPath} from 'node:url';
+import {extname, resolve, sep} from 'node:path';
+import {fileURLToPath, pathToFileURL} from 'node:url';
 
 import {FIXTURE_PORT as PORT} from '../lib/fixturePort.mjs';
 
-const ROOT = join(fileURLToPath(new URL('.', import.meta.url)), 'app');
+const HOST = '127.0.0.1';
+const ROOT = resolve(fileURLToPath(new URL('app/', import.meta.url)));
 
 const CONTENT_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -19,45 +20,64 @@ const CONTENT_TYPES = {
   '.css': 'text/css; charset=utf-8',
 };
 
-const server = createServer(async (request, response) => {
-  const requested = new URL(request.url, `http://localhost:${PORT}`).pathname;
-  const relative = normalize(requested === '/' ? '/index.html' : requested);
+export function createFixtureServer() {
+  return createServer(async (request, response) => {
+    let requested;
 
-  // normalize() resolves any `..` segments, so this rejects path traversal
-  // rather than merely discouraging it.
-  if (relative.includes('..')) {
-    response.writeHead(403).end('Forbidden');
-    return;
-  }
+    try {
+      requested = decodeURIComponent(request.url.split('?')[0]);
+    } catch {
+      response.writeHead(400).end('Bad request');
+      return;
+    }
 
-  try {
-    const body = await readFile(join(ROOT, relative));
-    response.writeHead(200, {
-      'Content-Type':
-        CONTENT_TYPES[extname(relative)] || 'application/octet-stream',
-      'Cache-Control': 'no-store',
-    });
-    response.end(body);
-  } catch {
-    response.writeHead(404).end('Not found');
-  }
-});
+    const relative = requested === '/' ? 'index.html' : requested.replace(/^\/+/, '');
+    const file = resolve(ROOT, relative);
 
-// Without this, a busy port surfaces as an unhandled 'error' event: a stack
-// trace that buries the one line telling you what to do about it.
-server.on('error', (error) => {
-  if (error.code === 'EADDRINUSE') {
-    console.error(
-      `Port ${PORT} is already in use, so the fixture app could not start.\n` +
-        'Stop whatever is holding it, or pick another port:\n' +
-        `  FIXTURE_PORT=${PORT + 1} npm run test:react`,
-    );
-    process.exit(1);
-  }
+    if (file !== ROOT && !file.startsWith(`${ROOT}${sep}`)) {
+      response.writeHead(403).end('Forbidden');
+      return;
+    }
 
-  throw error;
-});
+    try {
+      const body = await readFile(file);
+      response.writeHead(200, {
+        'Content-Type':
+          CONTENT_TYPES[extname(file)] || 'application/octet-stream',
+        'Cache-Control': 'no-store',
+      });
+      response.end(body);
+    } catch {
+      response.writeHead(404).end('Not found');
+    }
+  });
+}
 
-server.listen(PORT, () => {
-  console.log(`Fixture app on http://localhost:${PORT}`);
-});
+export function startFixtureServer() {
+  const server = createFixtureServer();
+
+  // Without this, a busy port surfaces as an unhandled 'error' event: a stack
+  // trace that buries the one line telling you what to do about it.
+  server.on('error', (error) => {
+    if (error.code === 'EADDRINUSE') {
+      console.error(
+        `Port ${PORT} is already in use, so the fixture app could not start.\n` +
+          'Stop whatever is holding it, or pick another port:\n' +
+          `  FIXTURE_PORT=${PORT + 1} npm run test:react`,
+      );
+      process.exit(1);
+    }
+
+    throw error;
+  });
+
+  server.listen(PORT, HOST, () => {
+    console.log(`Fixture app on http://${HOST}:${PORT}`);
+  });
+
+  return server;
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  startFixtureServer();
+}
