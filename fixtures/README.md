@@ -23,13 +23,14 @@ component's public API. Restyling, re-nesting, or rewriting the CSS does not.
 
 ## Accessibility
 
-The suite runs axe against this app with an **empty** accepted-violation list.
-Any violation is a bug to fix here, not to suppress in the test.
+The suite runs axe against the open menu state with an **empty**
+accepted-violation list. Any violation in that state is a bug to fix here, not
+to suppress in the test.
 
 ## Running it by hand
 
 ```sh
-npm run start:fixture   # builds, then serves on http://localhost:7357
+npm run start:fixture   # builds, then serves on http://127.0.0.1:7357
 ```
 
 During a test run TestCafe starts and stops the server itself via its `--app`

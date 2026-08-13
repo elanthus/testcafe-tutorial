@@ -39,8 +39,8 @@ docker build -t "$IMAGE" "$DIR"
 
 case "$SUITE" in
   all)
-    run_the_internet
     run_react
+    run_the_internet
     ;;
   the-internet)
     run_the_internet

@@ -10,14 +10,18 @@ on:
     - cron: '0 6 * * 1'
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   lint:
+    name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
       - run: npm ci
       - run: npm run lint
@@ -25,43 +29,71 @@ jobs:
   # Runs entirely against the fixture app in this repo. Deterministic, no
   # network. A failure here is always a real failure.
   test-local:
+    name: Local / Node ${{ matrix.node }} / ${{ matrix.browser }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - node: 22
+            browser: chrome
+          - node: 24
+            browser: chrome
+          - node: 24
+            browser: firefox
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 20
+          node-version: ${{ matrix.node }}
           cache: npm
       - run: npm ci
+      - run: npm run test:unit
+      - run: npm run build:fixture
       - name: React selector and accessibility suite
         run: >
-          npm run test:react --
+          npx testcafe ${{ matrix.browser }}:headless reactSelectors/tests/*.js
+          --app "node fixtures/serve.mjs"
           --screenshots path=screenshots,takeOnFails=true
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: failure()
         with:
-          name: failure-screenshots-local
+          name: failure-screenshots-local-node-${{ matrix.node }}-${{ matrix.browser }}
           path: screenshots/
           if-no-files-found: ignore
+
+  required:
+    name: CI
+    if: always()
+    needs: [lint, test-local]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Confirm required jobs passed
+        env:
+          LINT_RESULT: ${{ needs.lint.result }}
+          LOCAL_RESULT: ${{ needs.test-local.result }}
+        run: test "$LINT_RESULT" = success && test "$LOCAL_RESULT" = success
 
   # Runs against the-internet.herokuapp.com. Allowed to fail without failing
   # the build, because an outage there says nothing about this code. The step
   # still reports, so drift stays visible.
   test-external:
+    name: External (non-blocking)
+    needs: [lint, test-local]
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-node@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
       - run: npm ci
       - name: Third-party fixture site suite
         run: >
           npx testcafe chrome:headless theInternet/tests/*.js
           --screenshots path=screenshots,takeOnFails=true
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: failure()
         with:
           name: failure-screenshots-external

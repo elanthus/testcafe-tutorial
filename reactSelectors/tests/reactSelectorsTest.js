@@ -47,7 +47,7 @@ test('navigating via the collapsible components section', async (t) => {
   await t.expect(Selector('main h2').innerText).eql('Popover');
 });
 
-test('the gallery has no accessibility violations', async (t) => {
+test('the open menu state has no accessibility violations', async (t) => {
   const navigationDrawer = await NavigationDrawer.create();
   await navigationDrawer.openPage('Menu');
 

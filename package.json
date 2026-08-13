@@ -2,13 +2,16 @@
   "name": "testcafe-tutorial",
   "version": "1.0.0",
   "description": "TestCafe page-object patterns, React selectors, and axe accessibility checks.",
+  "type": "module",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "scripts": {
     "build:fixture": "esbuild fixtures/app/src/index.jsx --bundle --keep-names --jsx=automatic --outfile=fixtures/app/dist/bundle.js",
-    "test": "npm run test:the-internet && npm run test:react",
+    "test": "npm run test:local && npm run test:the-internet",
+    "test:local": "npm run test:unit && npm run test:react",
+    "test:unit": "node --test test/*.test.mjs",
     "test:the-internet": "testcafe chrome:headless theInternet/tests/*.js",
     "test:react": "npm run build:fixture && testcafe chrome:headless reactSelectors/tests/*.js --app \"node fixtures/serve.mjs\"",
     "test:live": "npm run build:fixture && testcafe chrome reactSelectors/tests/*.js -L --app \"node fixtures/serve.mjs\"",
@@ -18,12 +21,15 @@
   "devDependencies": {
     "@testcafe-community/axe": "^3.5.0",
     "axe-core": "^4.13.0",
-    "esbuild": "^0.25.0",
-    "eslint": "^9.39.0",
+    "esbuild": "^0.28.2",
+    "eslint": "^9.39.5",
     "eslint-plugin-react": "^7.37.5",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "testcafe": "^3.7.6",
     "testcafe-react-selectors": "^5.0.3"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true
   }
 }
