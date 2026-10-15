@@ -55,7 +55,7 @@ jobs:
           npx testcafe ${{ matrix.browser }}:headless reactSelectors/tests/*.js
           --app "node fixtures/serve.mjs"
           --screenshots path=screenshots,takeOnFails=true
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: failure()
         with:
           name: failure-screenshots-local-node-${{ matrix.node }}-${{ matrix.browser }}
@@ -93,7 +93,7 @@ jobs:
         run: >
           npx testcafe chrome:headless theInternet/tests/*.js
           --screenshots path=screenshots,takeOnFails=true
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: failure()
         with:
           name: failure-screenshots-external
