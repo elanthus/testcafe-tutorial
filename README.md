@@ -8,7 +8,7 @@ instead of guessing at markup, and accessibility checks that run alongside
 functional ones. The architecture here will help you build reliable,
 maintainable tests over time.
 
-Needs Node 22 or newer and a local Chrome. TestCafe drives browsers you have
+Needs Node 22.13+ on the 22.x line or Node 24+, and a local Chrome. TestCafe drives browsers you have
 installed rather than bundling its own. If you would rather not install Chrome,
 [`./build.sh`](#running) runs everything in a container instead.
 

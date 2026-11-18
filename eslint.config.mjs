@@ -29,8 +29,6 @@ const browserGlobals = {
   window: 'readonly',
 };
 
-import react from 'eslint-plugin-react';
-
 export default [
   {
     ignores: ['fixtures/app/dist/**'],
@@ -56,8 +54,6 @@ export default [
     // The React fixture app. Built with the automatic JSX runtime, so there is
     // no `React` import to keep alive.
     files: ['**/*.jsx'],
-    plugins: {react},
-    settings: {react: {version: 'detect'}},
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'module',
@@ -65,11 +61,6 @@ export default [
       globals: browserGlobals,
     },
     linterOptions: {reportUnusedDisableDirectives: true},
-    rules: {
-      ...rules,
-      // Without this, every component referenced only inside JSX reads as
-      // unused.
-      'react/jsx-uses-vars': 'error',
-    },
+    rules,
   },
 ];
