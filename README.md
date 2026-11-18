@@ -162,10 +162,11 @@ one we can actually fix.
 ### Accessibility baselines
 
 Both suites select [axe-core] rules tagged `wcag2a`, `wcag2aa`, `wcag21a`,
-`wcag21aa`, `best-practice`, or `section508`. The open-menu test in
-`fixtures/app` runs all selected rules. Any reported violation fails required CI.
+`wcag21aa`, `best-practice`, or `section508`. The `@testcafe-community/axe`
+helper disables `document-title` before both scans. The open-menu test in
+`fixtures/app` adds no exclusions. Any reported violation fails required CI.
 
-The third-party `/dynamic_controls` scan disables the three rules below for
+The third-party `/dynamic_controls` scan disables three additional rules for
 the entire page. A new violation of a disabled rule goes undetected, even on
 a different element. Violations of enabled rules fail the external test.
 GitHub Actions reports that job separately and allows it to fail.
