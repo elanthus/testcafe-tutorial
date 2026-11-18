@@ -42,7 +42,7 @@ described below.
 | Suite | Target | Demonstrates |
 |---|---|---|
 | `reactSelectors/` | `fixtures/app` - a minimal React app in this repo | React selectors, prop-based state queries, and an accessibility scan of the open menu state |
-| `theInternet/` | [the-internet], a third-party fixture site | Dynamic content, auto-waiting assertions, accessibility with a documented baseline |
+| `theInternet/` | [the-internet], a third-party fixture site | Dynamic content, auto-waiting assertions, accessibility with three documented rule exclusions |
 
 ```
 lib/config.js         environment resolution shared by both suites
@@ -161,17 +161,15 @@ one we can actually fix.
 
 ### Accessibility baselines
 
-Both suites run [axe-core] against the full WCAG 2.1 Level AA rule set, plus
-`best-practice` and `section508`. Axe's WCAG tags are additive per version
-rather than inclusive, so covering 2.1 AA means naming all four of `wcag2a`,
-`wcag2aa`, `wcag21a`, and `wcag21aa`.
+Both suites select [axe-core] rules tagged `wcag2a`, `wcag2aa`, `wcag21a`,
+`wcag21aa`, `best-practice`, or `section508`. The `@testcafe-community/axe`
+helper disables `document-title` before both scans. The open-menu test in
+`fixtures/app` adds no exclusions. Any reported violation fails required CI.
 
-For the tested open-menu state in `fixtures/app`, the accepted-violation list
-is empty and must stay that way.
-
-For the third-party site, it is not empty, because those violations are not
-ours to fix. Rather than disabling accessibility checking, the suite keeps an
-explicit, justified baseline. Anything outside it still fails:
+The third-party `/dynamic_controls` scan disables three additional rules for
+the entire page. A new violation of a disabled rule goes undetected, even on
+a different element. Violations of enabled rules fail the external test.
+GitHub Actions reports that job separately and allows it to fail.
 
 ```js
 const ACCEPTED_VIOLATIONS = {
@@ -209,15 +207,9 @@ in April 2026. Title III and Section 504 impose accessibility obligations
 without DOJ adopting a single web standard, which is why WCAG 2.1 AA is the
 working benchmark rather than a literal citation.
 
-That is also why the accessibility checks here are not decoration. Both suites
-run the full 2.1 AA rule set, and the `fixtures/app` open-menu scan permits no
-violations.
-
-It is an automated check, not a conformance claim. Axe covers roughly a third
-of WCAG success criteria; focus order, alt-text quality, and screen-reader
-semantics still need manual and assistive-technology testing. What this repo
-shows is the automatable portion wired into CI, so a regression fails the build
-instead of reaching a student.
+These automated checks cover part of WCAG. Assessing conformance also
+requires manual and assistive-technology testing for issues such as focus
+order, alt-text quality, and screen-reader semantics.
 
 [doj]: https://www.ada.gov/resources/2024-03-08-web-rule/
 
