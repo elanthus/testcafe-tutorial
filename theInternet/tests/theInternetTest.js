@@ -10,10 +10,9 @@ fixture`TheInternet`
   .clientScripts({module: 'axe-core/axe.min.js'});
 
 /**
- * the-internet is a third-party fixture site, so violations it ships with are
- * not ours to fix. Rather than turning accessibility checking off, we keep an
- * explicit baseline of rules we have triaged and accepted; anything outside
- * this list still fails the build.
+ * These exclusions apply to every element on the scanned third-party page.
+ * New violations of the same rules are skipped too. Violations of enabled
+ * rules fail this test. Its GitHub Actions job is non-blocking.
  *
  * Delete an entry to watch axe correctly report the violation.
  * See README.md - "Accessibility baselines" - for the reasoning.
