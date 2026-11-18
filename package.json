@@ -20,12 +20,12 @@
   },
   "devDependencies": {
     "@testcafe-community/axe": "^3.5.0",
-    "axe-core": "^4.13.0",
+    "axe-core": "^4.14.0",
     "esbuild": "^0.28.2",
     "eslint": "^10.14.0",
     "eslint-plugin-react": "^7.37.5",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0",
+    "react-dom": "^19.3.1",
     "testcafe": "^3.7.6",
     "testcafe-react-selectors": "^5.0.3"
   },
