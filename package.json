@@ -20,7 +20,7 @@
   },
   "devDependencies": {
     "@testcafe-community/axe": "^3.5.0",
-    "axe-core": "^4.14.0",
+    "axe-core": "^4.14.1",
     "esbuild": "^0.28.2",
     "eslint": "^10.14.0",
     "react": "^19.3.1",
